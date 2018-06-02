@@ -1,34 +1,56 @@
 <template>
-  <v-app>
-    <v-toolbar
-      app
-    >
-      <v-toolbar-side-icon @click.stop=""></v-toolbar-side-icon>
-      <v-toolbar-title v-text="title"></v-toolbar-title>
-      <v-spacer></v-spacer>
-    </v-toolbar>
+<v-app>
+
+    <TopNav/>
     <v-content>
-      <GameView/>
+      <GameView
+          :sim-data="simData"
+          :grid-data="gridData"
+      />
     </v-content>
-    <v-footer :fixed="fixed" app>
-      <span>by <a href="https://jaredduncan.com/" target="_blank">Jared Duncan</a></span>
+    <v-footer app class="pl-2">
+      <span>by <a href="https://jaredduncan.com/" target="_blank">Jared Duncan</a>, June 2018</span>
     </v-footer>
   </v-app>
 </template>
 
 <script>
 
+import TopNav from './components/TopNav';
 import GameView from './components/GameView';
 
 export default {
-    data() {
-        return {
-            title: 'Conway\'s Game of Life',
-        };
-    },
     name: 'App',
     components: {
+        TopNav,
         GameView,
+    },
+    data() {
+        return {
+            simData: {
+                iterationNum: 0,
+                isRunning: false,
+            },
+            gridData: {
+                cellData: [
+                    [
+                        0, 1, 1, 0,
+                    ],
+                    [
+                        0, 1, 0, 1,
+                    ],
+                    [
+                        1, 1, 0, 0,
+                    ],
+                ],
+            },
+        };
+    },
+    methods: {
+
+    },
+    created() {
+        console.log('app comp created');
     },
 };
 
