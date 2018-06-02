@@ -17,17 +17,19 @@
 </template>
 
 <script>
+
 import GameView from './components/GameView';
 
 export default {
-  data() {
-    return {
-      title: 'Conway\'s Game of Life',
-    };
-  },
-  name: 'App',
-  components: {
-    GameView,
-  },
+    data() {
+        return {
+            title: 'Conway\'s Game of Life',
+        };
+    },
+    name: 'App',
+    components: {
+        GameView,
+    },
 };
+
 </script>
