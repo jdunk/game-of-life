@@ -6,8 +6,7 @@
     >
         <v-toolbar-side-icon @click.stop="showSettings = !showSettings"></v-toolbar-side-icon>
         <v-toolbar-title>Conway's Game of Life</v-toolbar-title>
-        <v-spacer></v-spacer>
-
+        <SimulationPanel/>
     </v-toolbar>
 </div>
 </template>
@@ -15,6 +14,7 @@
 <script>
 
 import SettingsPanel from './SettingsPanel';
+import SimulationPanel from './SimulationPanel';
 
 export default {
     name: 'Top-nav',
@@ -25,6 +25,7 @@ export default {
     },
     components: {
         SettingsPanel,
+        SimulationPanel,
     },
 };
 

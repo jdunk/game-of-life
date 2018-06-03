@@ -1,5 +1,5 @@
 <template>
-<div class="simulation-panel">
+<div class="simulation-panel ml-5 mt-4">
     <v-layout align-center>
         <v-btn
             flat
@@ -17,24 +17,23 @@
         >
             <v-icon class="pa-0">pause</v-icon>
         </v-btn>
-        <v-flex class="ml-3 mr-2 grey lighten-2 elevation-2">
-            <div class="iteration-label grey lighten-3">
+        <v-btn
+            small
+            flat
+            class="ma-0 small"
+            @click.stop="resetSimulation"
+            :disabled="resetDisabled"
+        >
+            <v-icon>replay</v-icon>
+        </v-btn>
+        <v-flex class="ml-3 mr-2 cyan darken-3 white--text elevation-4">
+            <div class="iteration-label grey darken-3">
                 Iteration
             </div>
             <div class="iteration-num">
                 {{ iterationNum }}
             </div>
         </v-flex>
-        <v-btn
-            small
-            flat
-            dark
-            class="red lighten-1"
-            @click.stop="resetSimulation"
-            :disabled="resetDisabled"
-        >
-            Reset
-        </v-btn>
 
     </v-layout>
 </div>
@@ -44,36 +43,44 @@
 
 export default {
     name: 'Simulation-panel',
-    props: {
-        iterationNum: {
-            type: Number,
-            default: 0,
-        },
-        isRunning: {
-            type: Boolean,
-            default: false,
-        },
-    },
     computed: {
+        iterationNum() {
+            return this.$store.state.sim.iterationNum;
+        },
         playDisabled() {
-            return this.isRunning;
+            return this.$store.state.sim.isRunning;
         },
         pauseDisabled() {
-            return !this.isRunning;
+            return !this.$store.state.sim.isRunning;
         },
         resetDisabled() {
-            return !this.iterationNum;
+            return !this.$store.state.sim.iterationNum;
         },
     },
     methods: {
         startSimulation() {
-            this.isRunning = true;
+            this.$store.commit('enableRunningState');
+            this.runNextIteration();
         },
         stopSimulation() {
-            this.isRunning = false;
+            this.$store.commit('disableRunningState');
         },
         resetSimulation() {
-            this.iterationNum = 0;
+            this.$store.commit('resetIterationNum');
+        },
+        runNextIteration() {
+            if (!this.$store.state.sim.isRunning) {
+                return;
+            }
+
+            this.$store.commit('runNextIteration');
+            this.$store.commit('incrementIterationNum');
+
+            setTimeout(this.runNextIteration, this.getSimulationInterval());
+        },
+        getSimulationInterval() {
+            let speed = this.$store.state.sim.speed || 1;
+            return 1000 / speed;
         },
     },
 };
@@ -97,11 +104,10 @@ export default {
             padding-right: 0;
         }
     }
-
     .iteration-label {
         font-size: 12px;
         padding: 0px 8px;
-        margin: 2px 2px 3px 2px;
+        margin: 2px 2px 1px 2px;
     }
     .iteration-num {
         text-align: center;
@@ -110,4 +116,5 @@ export default {
         padding-bottom: 3px;
     }
 }
+
 </style>

@@ -5,7 +5,7 @@
     </div>
     <div v-else class="life-grid">
         <div
-            v-if="gridRow.length" class="grid-row"
+            v-if="gridRow && gridRow.length" class="grid-row"
             v-for="(gridRow, rowIndex) in cellData"
             :key="rowIndex"
         >
@@ -25,20 +25,16 @@ import GridCell from './GridCell';
 
 export default {
     name: 'LifeGrid',
-    props: {
-        cellData: {
-            type: Array,
-            default: [],
-        },
-    },
-    data() {
-        return {};
-    },
     components: {
         GridCell,
     },
+    computed: {
+        cellData() {
+            return this.$store.state.cellData;
+        },
+    },
     created() {
-        console.log('lifegrid created');
+        this.$store.commit('updateGridDimensions')
     },
 };
 

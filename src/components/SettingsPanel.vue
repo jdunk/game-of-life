@@ -24,9 +24,10 @@
                 label="↕"
                 thumb-label
                 hide-details
-                min="30"
-                max="2000"
+                min="5"
+                max="1000"
                 step="5"
+                :disabled="gridChangesDisabled"
             >
             </v-slider>
         </v-card-text>
@@ -43,9 +44,10 @@
                 label="↔"
                 thumb-label
                 hide-details
-                min="30"
-                max="2000"
+                min="5"
+                max="1000"
                 step="5"
+                :disabled="gridChangesDisabled"
             >
             </v-slider>
         </v-card-text>
@@ -55,14 +57,14 @@
         class="top-border"
     >
         <v-card-text>
-            <div class="body-2">Simulation speed:&nbsp;&nbsp;<span class="green--text"><strong>{{ simulationSpeed }}</strong></span></div>
+            <div class="body-2">Simulation speed:&nbsp;&nbsp;<span class="green--text"><strong>{{ simSpeed }}</strong></span></div>
 
             <v-layout>
                 <v-icon>flight_takeoff</v-icon>
 
                 <v-slider
+                    v-model="simSpeed"
                     class="py-0 ml-3"
-                    v-model="simulationSpeed"
                     thumb-label
                     hide-details
                     min="1"
@@ -78,6 +80,8 @@
 
 <script>
 
+import _debounce from 'lodash.debounce';
+
 export default {
     name: 'Settings-panel',
     props: {
@@ -88,18 +92,52 @@ export default {
     },
     data() {
         return {
-            gridHeight: 50,
-            gridWidth: 100,
-            simulationSpeed: 1,
         };
     },
-    methods: {
-        initGrid() {
-            console.log('settingspanel created');
-        }
+    computed: {
+        gridHeight: {
+            get() {
+                return this.$store.state.grid.height;
+            },
+            set(newHeight) {
+                this.$store.commit('updateGridHeight', newHeight);
+                console.log('updateGridHeight - NOT debounced: ' + newHeight);
+
+                return this.updateGridDimensions();
+            },
+        },
+        gridWidth: {
+            get() {
+                return this.$store.state.grid.width;
+            },
+            set(newWidth) {
+                this.$store.commit('updateGridWidth', newWidth);
+                console.log('updateGridWidth - NOT debounced: ' + newWidth);
+
+                return this.updateGridDimensions();
+            },
+        },
+        simSpeed: {
+            get() {
+                return this.$store.state.sim.speed;
+            },
+            set(newSpeed) {
+                if (!newSpeed) {
+                    return;
+                }
+                console.log('updateSimSpeed (not debounced) : ' + newSpeed);
+                this.$store.commit('updateSimSpeed', newSpeed);
+            },
+        },
+        gridChangesDisabled() {
+            return this.$store.state.sim.isRunning;
+        },
     },
-    created() {
-        this.initGrid();
+    methods: {
+        updateGridDimensions: _debounce(function() {
+            console.log('updateGridDimensions');
+            this.$store.commit('updateGridDimensions');
+        }, 300),
     },
 };
 

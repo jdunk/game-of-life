@@ -3,10 +3,7 @@
 
     <TopNav/>
     <v-content>
-      <GameView
-          :sim-data="simData"
-          :grid-data="gridData"
-      />
+      <GameView/>
     </v-content>
     <v-footer app class="pl-2">
       <span>by <a href="https://jaredduncan.com/" target="_blank">Jared Duncan</a>, June 2018</span>
@@ -24,33 +21,6 @@ export default {
     components: {
         TopNav,
         GameView,
-    },
-    data() {
-        return {
-            simData: {
-                iterationNum: 0,
-                isRunning: false,
-            },
-            gridData: {
-                cellData: [
-                    [
-                        0, 1, 1, 0,
-                    ],
-                    [
-                        0, 1, 0, 1,
-                    ],
-                    [
-                        1, 1, 0, 0,
-                    ],
-                ],
-            },
-        };
-    },
-    methods: {
-
-    },
-    created() {
-        console.log('app comp created');
     },
 };
 

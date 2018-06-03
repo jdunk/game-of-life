@@ -2,12 +2,7 @@
   <v-container fluid>
     <v-slide-y-transition mode="out-in">
       <v-layout column align-center>
-        <SimulationPanel
-            :iteration-num="simData.iterationNum"
-            :is-running="simData.isRunning"
-        />
         <LifeGrid
-            :cell-data="gridData.cellData"
             :is-editable="gridIsEditable"
         />
       </v-layout>
@@ -17,24 +12,12 @@
 
 <script>
 
-import SimulationPanel from './SimulationPanel';
 import LifeGrid from './LifeGrid';
 
 export default {
     name: 'GameView',
     components: {
-        SimulationPanel,
         LifeGrid,
-    },
-    props: {
-        gridData: {
-            type: Object,
-            required: true,
-        },
-        simData: {
-            type: Object,
-            required: true,
-        },
     },
     data() {
         return {
@@ -42,7 +25,7 @@ export default {
     },
     computed: {
         gridIsEditable() {
-            return !this.simData.iterationNum && !this.simData.isRunning;
+            return !this.$store.state.sim.iterationNum && !this.$store.state.sim.isRunning;
         },
     },
 };
