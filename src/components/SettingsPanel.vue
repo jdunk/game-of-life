@@ -25,7 +25,7 @@
                 thumb-label
                 hide-details
                 min="5"
-                max="1000"
+                max="100"
                 step="5"
                 :disabled="gridChangesDisabled"
             >
@@ -45,7 +45,7 @@
                 thumb-label
                 hide-details
                 min="5"
-                max="1000"
+                max="150"
                 step="5"
                 :disabled="gridChangesDisabled"
             >
@@ -101,7 +101,6 @@ export default {
             },
             set(newHeight) {
                 this.$store.commit('updateGridHeight', newHeight);
-                console.log('updateGridHeight - NOT debounced: ' + newHeight);
 
                 return this.updateGridDimensions();
             },
@@ -112,7 +111,6 @@ export default {
             },
             set(newWidth) {
                 this.$store.commit('updateGridWidth', newWidth);
-                console.log('updateGridWidth - NOT debounced: ' + newWidth);
 
                 return this.updateGridDimensions();
             },
@@ -125,7 +123,6 @@ export default {
                 if (!newSpeed) {
                     return;
                 }
-                console.log('updateSimSpeed (not debounced) : ' + newSpeed);
                 this.$store.commit('updateSimSpeed', newSpeed);
             },
         },
@@ -134,8 +131,7 @@ export default {
         },
     },
     methods: {
-        updateGridDimensions: _debounce(function() {
-            console.log('updateGridDimensions');
+        updateGridDimensions: _debounce(function () {
             this.$store.commit('updateGridDimensions');
         }, 300),
     },

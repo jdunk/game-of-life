@@ -5,22 +5,14 @@ export default {
         sim: {
             isRunning: false,
             iterationNum: 0,
-            speed: 1,
+            speed: 8,
+            speedBumpMilliseconds: 97,
         },
         grid: {
             height: 50,
             width: 80,
         },
         cellData: [
-            [
-                0, 1, 1, 0,
-            ],
-            [
-                0, 1, 0, 1,
-            ],
-            [
-                1, 1, 0, 0,
-            ],
         ],
     },
     mutations: {
@@ -36,6 +28,10 @@ export default {
         },
         updateSimSpeed(state, newSpeed) {
             state.sim.speed = newSpeed;
+            state.sim.speedBumpMilliseconds = Math.max(
+                Math.round(1000 * (1 - (Math.log(newSpeed) / Math.log(10)))),
+                0,
+            );
         },
         updateGridDimensions(state) {
             state.cellData.length = state.grid.height;
@@ -60,12 +56,10 @@ export default {
             }
         },
         toggleCell(state, coords) {
-            console.log({first: state.cellData[coords.x], second: coords.y, third: !state.cellData[coords.x][coords.y]});
             Vue.set(state.cellData[coords.x], coords.y, !state.cellData[coords.x][coords.y]);
         },
-        runNextIteration(state) {
-            Vue.set(state.cellData[0], 0, !state.cellData[0][0]);
-            Vue.set(state.cellData[2], 0, !state.cellData[2][0]);
+        updateCellData(state, cellData) {
+            state.cellData = cellData;
         },
     },
 };

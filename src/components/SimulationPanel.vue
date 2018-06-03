@@ -73,14 +73,69 @@ export default {
                 return;
             }
 
-            this.$store.commit('runNextIteration');
+            this.$store.commit('updateCellData', this.getNextIterationCellData(this.$store.state.cellData));
             this.$store.commit('incrementIterationNum');
 
-            setTimeout(this.runNextIteration, this.getSimulationInterval());
+            setTimeout(this.runNextIteration, this.$store.state.sim.speedBumpMilliseconds);
         },
-        getSimulationInterval() {
-            let speed = this.$store.state.sim.speed || 1;
-            return 1000 / speed;
+        getNextIterationCellData(currCellData) {
+            let nextCellData = currCellData.slice(0);
+
+            /* Game rules implemented here! */
+
+            currCellData.forEach((row, x) => {
+                nextCellData[x] = row.slice(0);
+
+                row.forEach((val, y) => {
+                    let numNeighbors = 0,
+                        prevX = x - 1,
+                        nextX = x + 1,
+                        prevY = y - 1,
+                        nextY = y + 1;
+
+                    // Check North neighbors
+                    if (currCellData[prevX]) {
+                        numNeighbors +=
+                            (currCellData[prevX][prevY] || 0) +
+                            currCellData[prevX][y] +
+                            (currCellData[prevX][nextY] || 0);
+                    }
+
+                    // Check West neighbor
+                    if (y >= 0 && row[prevY]) {
+                        numNeighbors++;
+                    }
+
+                    // Check East neighbor
+                    if (y < row.length && row[nextY]) {
+                        numNeighbors++;
+                    }
+
+                    // Check South neighbors
+                    if (currCellData[nextX]) {
+                        numNeighbors +=
+                            (currCellData[nextX][prevY] || 0) +
+                            currCellData[nextX][y] +
+                            (currCellData[nextX][nextY] || 0);
+                    }
+
+                    if (numNeighbors > 3) {
+                        // Overpopulated
+                        nextCellData[x][y] = 0;
+                    }
+                    else if (numNeighbors === 3) {
+                        // Goldilocks Zone
+                        nextCellData[x][y] = 1;
+                    }
+                    // 2 === Enough to survive, but not enough to breed. No state change.
+                    else if (numNeighbors < 2) {
+                        // Underpopulated
+                        nextCellData[x][y] = 0;
+                    }
+                });
+            });
+
+            return nextCellData;
         },
     },
 };
@@ -93,7 +148,6 @@ export default {
 
     margin-bottom: 15px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
 
     .btn.small {
         min-width: 30px;
