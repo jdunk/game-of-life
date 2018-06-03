@@ -25,7 +25,7 @@ export default {
     },
     computed: {
         gridIsEditable() {
-            return !this.$store.state.sim.iterationNum && !this.$store.state.sim.isRunning;
+            return !this.$store.state.sim.isRunning;
         },
     },
 };

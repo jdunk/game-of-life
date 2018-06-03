@@ -1,5 +1,9 @@
 <template>
-<div class="grid-cell" :class="isPopulated ? 'populated' : ''">
+<div
+    class="grid-cell"
+    :class="{ populated: isPopulated, editable: isEditable }"
+    @click.stop="$emit('click')"
+>
 </div>
 </template>
 
@@ -8,7 +12,7 @@
 export default {
     name: 'Grid-cell',
     props: {
-        isClickable: {
+        isEditable: {
             type: Boolean,
             default: false,
         },
@@ -36,6 +40,9 @@ export default {
 
     &.populated {
         background-color: darkcyan;
+    }
+    &.editable {
+        cursor: pointer;
     }
 }
 

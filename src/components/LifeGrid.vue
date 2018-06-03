@@ -13,6 +13,8 @@
                 v-for="(cell, colIndex) in gridRow"
                 :key="`${rowIndex}-${colIndex}`"
                 :is-populated="!!cell"
+                :is-editable="isEditable"
+                @click="toggleCell(rowIndex, colIndex)"
             />
         </div>
     </div>
@@ -28,13 +30,29 @@ export default {
     components: {
         GridCell,
     },
+    props: {
+        isEditable: {
+            type: Boolean,
+            default: false,
+        },
+    },
     computed: {
         cellData() {
             return this.$store.state.cellData;
         },
     },
+    methods: {
+        toggleCell(x, y) {
+            if (!this.isEditable) {
+                return;
+            }
+
+            this.$store.commit('toggleCell', { x, y });
+            this.$store.commit('resetIterationNum');
+        },
+    },
     created() {
-        this.$store.commit('updateGridDimensions')
+        this.$store.commit('updateGridDimensions');
     },
 };
 

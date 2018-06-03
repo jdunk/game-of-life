@@ -5,19 +5,17 @@ import Vuetify from 'vuetify';
 import Vuex from 'vuex';
 import 'vuetify/dist/vuetify.min.css';
 import App from './App';
-import GlobalStore from './global-store';
+import store from './global-store';
 
 Vue.use(Vuetify);
 Vue.use(Vuex);
 
 Vue.config.productionTip = false;
 
-let store = GlobalStore();
-
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
-    store,
+    store: new Vuex.Store(store),
     components: { App },
     template: '<App/>',
 });
