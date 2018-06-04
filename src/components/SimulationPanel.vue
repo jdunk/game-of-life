@@ -26,14 +26,69 @@
         >
             <v-icon>replay</v-icon>
         </v-btn>
-        <v-flex class="ml-3 mr-2 cyan darken-3 white--text elevation-4">
+        <v-flex class="ml-3 mr-3 cyan darken-3 white--text elevation-4">
             <div class="iteration-label grey darken-3">
-                Iteration
+                Generation
             </div>
             <div class="iteration-num">
                 {{ iterationNum }}
             </div>
         </v-flex>
+
+        <v-menu
+            v-model="showCopyDialog"
+            bottom-center
+            offset-y
+        >
+            <v-btn
+                slot="activator"
+                small
+                flat
+                class="ml-0 mr-2 small"
+                @click="populateCellDataJSON"
+                :disabled="copyCellDataDisabled"
+            >
+                <v-tooltip bottom>
+                    <v-icon slot="activator">content_copy</v-icon>
+                    <span>
+                    Get JSON
+                    </span>
+                </v-tooltip>
+            </v-btn>
+            <v-card color="grey lighten-4" flat>
+                <v-card-text>
+                    <div>
+                        Here is the JSON-data for the grid cells:
+                    </div>
+                </v-card-text>
+                <v-text-field
+                    dark
+                    autofocus
+                    hide-details
+                    full-width
+                    single-line
+                    multi-line
+                    ref="currCellDataJSON"
+                    v-model="currCellDataJSON"
+                    class="grey darken-3"
+                />
+            </v-card>
+        </v-menu>
+
+        <v-btn
+            small
+            flat
+            class="ml-0 mr-2 small"
+            @click.stop="clearGrid"
+            :disabled="clearDisabled"
+        >
+            <v-tooltip bottom>
+                <v-icon slot="activator">delete_forever</v-icon>
+                Clear Grid
+            </v-tooltip>
+        </v-btn>
+
+        <SavedGridLoader/>
 
     </v-layout>
 </div>
@@ -41,8 +96,20 @@
 
 <script>
 
+import cf from '../CommonFunctions';
+import SavedGridLoader from './SavedGridLoader';
+
 export default {
     name: 'Simulation-panel',
+    components: {
+        SavedGridLoader,
+    },
+    data() {
+        return {
+            currCellDataJSON: '',
+            showCopyDialog: false,
+        };
+    },
     computed: {
         iterationNum() {
             return this.$store.state.sim.iterationNum;
@@ -56,16 +123,81 @@ export default {
         resetDisabled() {
             return !this.$store.state.sim.iterationNum;
         },
+        copyCellDataDisabled() {
+            return this.$store.state.sim.isRunning;
+        },
+        clearDisabled() {
+            return this.$store.state.sim.isRunning;
+        },
+    },
+    watch: {
+        showCopyDialog(newValue) {
+            if (!newValue) {
+                return;
+            }
+
+            // this.$nextTick() isn't enough ¯\_(ツ)_/¯
+            setTimeout(() => {
+                this.$refs.currCellDataJSON.$refs.input.select();
+            }, 120);
+        },
     },
     methods: {
+        getNumLiveCells(cellData) {
+            let count = cellData.reduce((runningTotal, row) =>
+                runningTotal + row.reduce((rt2, currVal) => rt2 + currVal, 0)
+            , 0);
+
+            return count;
+        },
+        populateCellDataJSON() {
+            this.currCellDataJSON = JSON.stringify(this.$store.state.cellData);
+        },
+        saveCurrentGrid() {
+            if (this.iterationNum !== 0 || this.$store.state.grid.isFreshlyLoaded) {
+                return;
+            }
+
+            if (cf.getLastSavedGridString(this.$store) === JSON.stringify(this.$store.state.cellData)) {
+                return;
+            }
+
+            // Grid has been modified since last save. Save new version.
+
+            let savedGrids = JSON.parse(localStorage.getItem('savedGrids')) || [],
+                numLiveCells = this.getNumLiveCells(this.$store.state.cellData);
+
+            // Don't save empty grids
+            if (!numLiveCells) {
+                return;
+            }
+
+            savedGrids.push({
+                cellData: this.$store.state.cellData,
+                height: this.$store.state.cellData.length,
+                width: this.$store.state.cellData[0].length,
+                numLiveCells,
+                savedAt: new Date(),
+            });
+
+            localStorage.setItem('savedGrids', JSON.stringify(savedGrids));
+            this.$store.commit('updateSavedGrids', savedGrids);
+        },
+        clearGrid() {
+            cf.clearGrid(this.$store);
+        },
         startSimulation() {
+            this.saveCurrentGrid();
+            this.$store.commit('saveLastStartedCellData');
             this.$store.commit('enableRunningState');
+            this.$store.commit('setFreshlyLoaded', false);
             this.runNextIteration();
         },
         stopSimulation() {
             this.$store.commit('disableRunningState');
         },
         resetSimulation() {
+            cf.loadLastStartedCellData(this.$store);
             this.$store.commit('resetIterationNum');
         },
         runNextIteration() {
@@ -137,6 +269,9 @@ export default {
 
             return nextCellData;
         },
+    },
+    created() {
+        cf.initSavedGridsFromLocalStorage(this.$store);
     },
 };
 

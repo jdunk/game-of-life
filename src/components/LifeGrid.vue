@@ -24,6 +24,7 @@
 <script>
 
 import GridCell from './GridCell';
+import cf from '../CommonFunctions';
 
 export default {
     name: 'LifeGrid',
@@ -49,9 +50,12 @@ export default {
 
             this.$store.commit('toggleCell', { x, y });
             this.$store.commit('resetIterationNum');
+            this.$store.commit('setFreshlyLoaded', false);
         },
     },
     created() {
+        cf.loadLastSavedGrid(this.$store);
+
         this.$store.commit('updateGridDimensions');
     },
 };

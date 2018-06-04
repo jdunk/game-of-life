@@ -123,7 +123,9 @@ export default {
                 if (!newSpeed) {
                     return;
                 }
+
                 this.$store.commit('updateSimSpeed', newSpeed);
+                localStorage.setItem('simSpeed', newSpeed);
             },
         },
         gridChangesDisabled() {
@@ -131,9 +133,18 @@ export default {
         },
     },
     methods: {
-        updateGridDimensions: _debounce(function () {
+        updateGridDimensions: _debounce(function updateGridDimensionsNow() {
             this.$store.commit('updateGridDimensions');
-        }, 300),
+        }, 500),
+    },
+    created() {
+        let savedSpeed = localStorage.getItem('simSpeed');
+
+        if (savedSpeed === null) {
+            return;
+        }
+
+        this.$store.commit('updateSimSpeed', savedSpeed);
     },
 };
 

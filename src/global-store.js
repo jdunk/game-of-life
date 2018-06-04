@@ -9,11 +9,12 @@ export default {
             speedBumpMilliseconds: 97,
         },
         grid: {
-            height: 50,
+            height: 60,
             width: 80,
+            isFreshlyLoaded: false,
         },
-        cellData: [
-        ],
+        cellData: [],
+        savedGrids: [],
     },
     mutations: {
         enableRunningState: state => state.sim.isRunning = true,
@@ -56,10 +57,24 @@ export default {
             }
         },
         toggleCell(state, coords) {
-            Vue.set(state.cellData[coords.x], coords.y, !state.cellData[coords.x][coords.y]);
+            Vue.set(state.cellData[coords.x], coords.y, !state.cellData[coords.x][coords.y] ? 1 : 0);
         },
         updateCellData(state, cellData) {
             state.cellData = cellData;
+            state.grid.height = cellData.length;
+            state.grid.width = cellData[0].length;
+        },
+        saveLastStartedCellData(state) {
+            state.lastStartedCellData = state.cellData;
+        },
+        updateSavedGrids(state, savedGrids) {
+            state.savedGrids = savedGrids;
+        },
+        removeSavedGrid(state, idx) {
+            state.savedGrids.splice(idx, 1);
+        },
+        setFreshlyLoaded(state, ifl) {
+            state.grid.isFreshlyLoaded = ifl;
         },
     },
 };

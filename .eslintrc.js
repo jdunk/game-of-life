@@ -37,6 +37,7 @@ module.exports = {
     "brace-style": ["error", "stroustrup"],
     "no-unused-expressions": ["error", { "allowShortCircuit": true }],
     "no-param-reassign": 0,
+    "no-return-assign": 0,
 
       // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
